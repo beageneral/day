@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- 写模板 -->
+
+    <div id="root">
+        <div>
+          <p>{{name}}-{{message}}</p>
+        </div>
+        <p>{{name}}</p>
+        <p>{{message}}</p>
+      </div>
+
+    <script>
+        let tmpNode = document.getElementById('root')
+        console.log(tmpNode.childNodes)
+        let data = {
+            name:'data name',
+            message:'data message'
+        }
+        let rkuohao = /\{\{(.+?)\}\}/g;
+        function compiler (template,data) {
+            
+            let childNodes = template.childNodes; //取出子元素
+            for(let i =0;i<childNodes.length;i++) {
+                let type = childNodes[i].nodeType;
+                if(type === 3) {
+                    //文本节点，可以判断里面是否又{{}}
+                    let txt = childNodes[i].nodeValue
+                    txt = txt.replace(rkuohao,function(_,g){
+                        let key  = g.trim() // 写在双花括号里面额东西
+                        let value = data[key]
+                        return value
+                    })
+
+                    childNodes[i].nodeValue = txt
+
+                } else if(type === 1){
+                    compiler(childNodes[i],data)
+                }
+            }
+        }
+
+        //let generateNode = tmpNode.cloneNode(true) //注意这里是DOm元素可以这么用
+        let generateNode = tmpNode.cloneNode( true );
+        compiler(generateNode,data)
+
+        root.parentNode.replaceChild(generateNode,root)
+
+    </script>
+</body>
+</html>
